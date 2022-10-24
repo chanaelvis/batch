@@ -1,0 +1,25 @@
+node('bacth') 
+{
+   stage('Continuous Download ')
+       {
+       git branch: 'beer', url: 'https://github.com/chanaelvis/batch.git'  
+       }
+   stage('Continuous Build') 
+       {
+       input 'Please authorize in order to proceed'    
+       sh 'mvn package'   
+       } 
+    stage('Continuous Deployment') 
+       {
+       deploy adapters: [tomcat8(credentialsId: 'don', path: '', url: 'http://172.31.82.232:8080')], contextPath: 'qaenv', war: '**/*.war'
+       } 
+    stage('Continuous Testing') 
+       {
+        echo 'testing has passed'
+       }  
+    stage('Continuous Delivery') 
+       { 
+        input 'Please authorize in order to proceed'   
+       deploy adapters: [tomcat8(credentialsId: 'prod', path: '', url: 'http://172.31.81.47:8080')], contextPath: 'prodenv', war: '**/*.war'
+       }   
+}
